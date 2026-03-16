@@ -15,11 +15,11 @@ from helper import (
 # ---- 1. CONFIG ----
 TICKER = "SPY"   # S&P 500
 YEARS = 10
-TRAIN_RATIO = 0.8   
-end = "2026-02-23"
+TRAIN_RATIO = 0.8
+
 # ---- 2. LOAD DATA ----
 def load_data(ticker, years):
-    end = pd.Timestamp.now().normalize()
+    end = pd.Timestamp("2026-03-01")  # fixed end date for reproducibility
     start = end - pd.DateOffset(years=years)
     data = yf.download(ticker, start=start, end=end, progress=False, auto_adjust=True)
     if isinstance(data.columns, pd.MultiIndex):
@@ -118,8 +118,8 @@ def run(animate=False, save_animation=None, animate_monte_carlo=False, save_mont
 
     # Monte Carlo: sample from return distribution for a distribution of outcomes
     print("Monte Carlo evaluation (bootstrap return paths)...")
-    val_returns = df.iloc[train_size:]["target"].values  # next-day returns in val
-    positions = np.sign(pred_returns)  # +1 long, -1 short, 0 flat
+    val_returns = df.iloc[train_size:]["target"].values  
+    positions = np.sign(pred_returns) 
     pct_long = 100 * (positions > 0).mean()
     pct_short = 100 * (positions < 0).mean()
     pct_flat = 100 * (positions == 0).mean()
